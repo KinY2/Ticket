@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Virtual Ticket</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 50px;
+    background-color: #f0f0f0;
+  }
+
+  .ticket {
+    position: relative;
+    width: 90%;
+    max-width: 600px;     /* width for 3:1 ratio */
+    aspect-ratio: 3 / 1;  /* ensures proper 3:1 ratio */
+    margin: 20px auto;
+    background: url('ticket.png') no-repeat center center;
+    background-size: cover;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5vw;        /* scales with screen */
+    color: #000;
+    font-weight: bold;
+  }
+
+  #generateBtn {
+    padding: 12px 24px;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 6px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    margin-top: 20px;
+  }
+
+  #generateBtn:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+
+<h1>Virtual Entry Ticket</h1>
+<div class="ticket" id="ticketDisplay">Your Seat</div>
+<button id="generateBtn">Get Your Ticket</button>
+
+<script>
+  // List of available seats
+  const seats = ['A1','A2','A3','B1','B2','B3','C1','C2','C3'];
+
+  // Pick a random seat
+  function getRandomSeat() {
+    return seats[Math.floor(Math.random() * seats.length)];
+  }
+
+  // Get user seat from localStorage or generate new
+  function getUserSeat() {
+    let seat = localStorage.getItem('mySeat');
+    if (!seat) {
+      seat = getRandomSeat();
+      localStorage.setItem('mySeat', seat);
+    }
+    return seat;
+  }
+
+  // Event listener for button
+  document.getElementById('generateBtn').addEventListener('click', () => {
+    const seat = getUserSeat();
+    const ticketDiv = document.getElementById('ticketDisplay');
+    ticketDiv.innerText = `Seat: ${seat}`;
+    
+    // Optional: simple fade-in animation
+    ticketDiv.style.opacity = 0;
+    ticketDiv.style.transition = 'opacity 0.5s';
+    setTimeout(() => { ticketDiv.style.opacity = 1; }, 50);
+    
+    // Disable button after generating
+    document.getElementById('generateBtn').disabled = true;
+    document.getElementById('generateBtn').innerText = "Ticket Generated";
+  });
+
+  // Auto-show seat if already stored
+  window.addEventListener('load', () => {
+    if (localStorage.getItem('mySeat')) {
+      const seat = localStorage.getItem('mySeat');
+      document.getElementById('ticketDisplay').innerText = `Seat: ${seat}`;
+      document.getElementById('generateBtn').disabled = true;
+      document.getElementById('generateBtn').innerText = "Ticket Generated";
+    }
+  });
+</script>
+
+</body>
+</html>
