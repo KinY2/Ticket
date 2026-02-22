@@ -12,18 +12,17 @@
   body {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Roboto', sans-serif;
     background-color: #f0f0f0;
     overflow-x: hidden;
   }
 
-  /* Ticket styles */
   .ticket {
     position: absolute;
-    right: -100%;      /* start off-screen right */
+    right: -100%;
     top: 10%;
     transform: translateY(-50%);
-    height: 80vh;      /* almost full screen height */
+    height: 80vh;
     aspect-ratio: 3 / 1;
     transform-origin: right center;
     background: url('ticket.png') no-repeat center center;
@@ -37,52 +36,35 @@
     color: #000;
   }
 
-  /* Seat display */
   #seatDisplay {
     position: absolute;
     top: 75%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 30px;
+    font-size: 4vh;
     color: white;
-    display: none; /* hidden until rotation complete */
-    font-family: 'Roboto', sans-serif;
+    display: none;
   }
 
-  /* Button */
   #generateBtn {
     display: none;
     position: absolute;
     top: 75%;
-    left: 45%; /* approximate final right edge of ticket */
+    left: 45%;
     transform: translateY(-50%);
     padding: 12px 24px;
-    font-size: 30px;
+    font-size: 4vh;
     background-color: #007bff;
     color: white;
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    font-family: 'Roboto', sans-serif;
   }
 
-  /* Keyframes: move from right to left, then rotate at the end */
   @keyframes slideAndRotate {
-    0% {
-      right: -100%;
-      transform: rotate(0deg) scale(1);
-    }
-    60% {
-      top: 10%;
-      right: 50%;
-      transform: rotate(0deg) scale(1);
-    }
-
-    100% {
-      right: 50%;
-      top: 50%;
-      transform: rotate(90deg);
-    }
+    0% { right: -100%; transform: rotate(0deg) scale(1); }
+    60% { top: 10%; right: 50%; transform: rotate(0deg) scale(1); }
+    100% { right: 50%; top: 50%; transform: rotate(90deg); }
   }
 
   .animateTicket {
@@ -97,46 +79,38 @@
 <button id="generateBtn">Click me!</button>
 
 <script>
-  const seats = ["Président","Vice-président"];
-
-  function getRandomSeat() {
-    return seats[Math.floor(Math.random() * seats.length)];
-  }
-
-  function getUserSeat() {
-    let seat = localStorage.getItem('mySeat');
-    if (!seat) {
-      seat = getRandomSeat();
-      localStorage.setItem('mySeat', seat);
-    }
-    return seat;
-  }
-
   const ticketDiv = document.getElementById('ticketDisplay');
   const seatDiv = document.getElementById('seatDisplay');
   const button = document.getElementById('generateBtn');
 
   window.addEventListener('load', () => {
-    const seat = getUserSeat(); // get stored/random seat
-
-    // Start ticket animation
+    // start ticket animation
     ticketDiv.classList.add('animateTicket');
 
-    // Show button after ticket animation (3s)
+    // show button after animation
     setTimeout(() => {
       button.style.display = 'block';
-    }, 3000); // matches animation duration
+    }, 3000);
 
-    // On button click: hide button, show seat
-    button.addEventListener('click', () => {
-      button.style.display = 'none';          // hide the button
-      seatDiv.innerText = `Seat: ${seat}`;    // display the seat number
-      seatDiv.style.display = 'block';
+    // button click: fetch seat from server
+    button.addEventListener('click', async () => {
+      button.style.display = 'none';
+      try {
+        const response = await fetch('http://localhost:3000/get-seat');
+        const data = await response.json();
+
+        if (data.seat) {
+          seatDiv.innerText = data.seat;
+        } else {
+          seatDiv.innerText = 'No seats available';
+        }
+        seatDiv.style.display = 'block';
+      } catch (err) {
+        seatDiv.innerText = 'Error fetching seat';
+        seatDiv.style.display = 'block';
+        console.error(err);
+      }
     });
-  });
-
-  button.addEventListener('click', () => {
-    button.style.display = 'none';
   });
 </script>
 
