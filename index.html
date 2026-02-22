@@ -97,7 +97,7 @@
       button.style.display = 'none';
 
       try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbwew1BVc9jMVguGKZxykjp3g85yt1jqyJStTWd8HvSDROQ-DxrP_tJeYsumiN-opC2S/exec");
+        const response = await fetch("https://script.google.com/macros/s/AKfycbxolmsKQto0Z75AY-OZs_5Ai1aCyYFUCTCR3w7MykJejKOcWunUSCpQOpVUZj1YEJeA/exec");
         const data = await response.json();
         if (data.seat) {
           seatDiv.innerText = data.seat;
