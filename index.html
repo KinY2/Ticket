@@ -13,14 +13,14 @@
     margin: 0;
     padding: 0;
     font-family: 'Roboto', sans-serif;
-    background-color: #f0f0f0;
+    background-color: #1a1a1a;
     overflow-x: hidden;
   }
 
   .ticket {
     position: absolute;
-    right: -100%;
-    top: 10%;
+    right: -100%; /* start off-screen */
+    top: -100%;
     transform: translateY(-50%);
     height: 80vh;
     aspect-ratio: 3 / 1;
@@ -28,7 +28,7 @@
     background: url('ticket.png') no-repeat center center;
     background-size: cover;
     border-radius: 10px;
-    display: flex;
+    display: flex; /* keep it visible for animation */
     align-items: center;
     justify-content: center;
     font-size: 4vw;
@@ -47,10 +47,10 @@
   }
 
   #generateBtn {
-    display: none;
+    display: block; /* button visible from start */
     position: absolute;
-    top: 75%;
-    left: 50%;
+    top: 50%;
+    left: 40%;
     transform: translateY(-50%);
     padding: 12px 24px;
     font-size: 4vh;
@@ -62,8 +62,9 @@
   }
 
   @keyframes slideAndRotate {
-    0% { right: -100%; transform: rotate(0deg) scale(1); }
-    60% { top: 10%; right: 50%; transform: rotate(0deg) scale(1); }
+    0% {top: 10%; right: -100%; transform: rotate(0deg) scale(1); }
+    50% {right: -30%;}
+    70% { top: 10%; right: 30%; transform: rotate(0deg);}
     100% { right: 50%; top: 50%; transform: rotate(90deg); }
   }
 
@@ -76,42 +77,43 @@
 
 <div class="ticket" id="ticketDisplay"></div>
 <div id="seatDisplay"></div>
-<button id="generateBtn">Click me!</button>
+<button id="generateBtn">Click!</button>
 
 <script>
-  const ticketDiv = document.getElementById('ticketDisplay');
-  const seatDiv = document.getElementById('seatDisplay');
-  const button = document.getElementById('generateBtn');
+const ticketDiv = document.getElementById('ticketDisplay');
+const seatDiv = document.getElementById('seatDisplay');
+const button = document.getElementById('generateBtn');
 
-  window.addEventListener('load', () => {
-    // start ticket animation
-    ticketDiv.classList.add('animateTicket');
+button.addEventListener('click', async () => {
+  button.style.display = 'none';
 
-    // show button after animation
-    setTimeout(() => {
-      button.style.display = 'block';
-    }, 3000);
+  // Start animation
+  ticketDiv.classList.add('animateTicket');
 
-    // button click: fetch seat from server
-    button.addEventListener('click', async () => {
-      button.style.display = 'none';
-      seatDiv.innerText = 'Loading…';
-      seatDiv.style.display = 'block';
+  setTimeout(() => {
+    ticketDiv.style.animationPlayState = 'paused';
+  }, 1500);
 
-      try {
-        const response = await fetch("https://script.google.com/macros/s/AKfycbxolmsKQto0Z75AY-OZs_5Ai1aCyYFUCTCR3w7MykJejKOcWunUSCpQOpVUZj1YEJeA/exec");
-        const data = await response.json();
-        if (data.seat) {
-          seatDiv.innerText = data.seat;
-        } else {
-          seatDiv.innerText = 'No seats available';
-        }
-      } catch (err) {
-        seatDiv.innerText = 'Error fetching seat';
-        console.error(err);
-      }
-    });;
-  });
+  // Fetch seat from Google Sheets
+  let seatText = '';
+  try {
+    const response = await fetch("https://script.google.com/macros/s/AKfycbxolmsKQto0Z75AY-OZs_5Ai1aCyYFUCTCR3w7MykJejKOcWunUSCpQOpVUZj1YEJeA/exec");
+    const data = await response.json();
+    seatText = data.seat || 'Fini :(';
+  } catch (err) {
+    seatText = 'Error fetching seat';
+    console.error(err);
+  }
+
+  // Resume animation to finish remaining 70%
+  ticketDiv.style.animationPlayState = 'running';
+
+  // Show text only after animation completes
+  ticketDiv.addEventListener('animationend', () => {
+    seatDiv.innerText = seatText;
+    seatDiv.style.display = 'block';
+  }, { once: true });
+});
 </script>
 
 </body>
