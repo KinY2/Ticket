@@ -95,6 +95,8 @@
     // button click: fetch seat from server
     button.addEventListener('click', async () => {
       button.style.display = 'none';
+      seatDiv.innerText = 'Loading…';
+      seatDiv.style.display = 'block';
 
       try {
         const response = await fetch("https://script.google.com/macros/s/AKfycbxolmsKQto0Z75AY-OZs_5Ai1aCyYFUCTCR3w7MykJejKOcWunUSCpQOpVUZj1YEJeA/exec");
@@ -104,13 +106,11 @@
         } else {
           seatDiv.innerText = 'No seats available';
         }
-        seatDiv.style.display = 'block';
       } catch (err) {
         seatDiv.innerText = 'Error fetching seat';
-        seatDiv.style.display = 'block';
         console.error(err);
       }
-    });
+    });;
   });
 </script>
 
